@@ -1,6 +1,6 @@
 const _ = require("lodash");
 const usersModel = require("../models/users");
-const listUser = [];
+//const listUser = [];
 
 class User {
   list() {
@@ -18,6 +18,20 @@ class User {
         }
       )*/
     });
+  }
+
+  async deleteUser(userId) {
+    //return await usersModel.deleteOne({_id:`ObjectId("${userid}")`});
+    return await usersModel.findByIdAndDelete(userId);
+  }
+
+  async updateUser(userId, body) {
+    return await usersModel.findByIdAndUpdate(userId, body);
+  }
+
+  async listUser(userId) {
+    //return await usersModel.find({_id:`ObjectId(${userId})`},{})
+    return await usersModel.findById(userId);
   }
 
   async store(name, lastname, email, password) {

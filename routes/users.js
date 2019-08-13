@@ -16,26 +16,42 @@ router.get("/", (req, res) => {
   );
 });
 
-router.get("/:userId/show", (req, res) => {
-  //const userId = req.params.userId
-  const { userId } = req.params;
-  const userSelect = listUser.find(x => x.id === Number(userId));
-  /*
-    const userSelect = listUser.find( (user) => {
-        if ( user.id === Number(userId)){
-            return true;
-        }
-    })*/
-  if (userSelect) {
+router.get("/:userId/show", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const userSelect = await userController.listUser(userId);
+    console.log(userSelect);
+
     return res.json(userSelect);
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Usuario no encontrado", data: error });
   }
-  return res.status(500).json({ message: "Usuario no encontrado" });
 });
 
-router.delete("/:userId", (req, res) => {
-  const { userId } = req.params;
-  const resultIndex = listUser.findIndex(user => user.id === Number(userId));
+router.delete("/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    //const resultIndex = listUser.findIndex(user => user.id === Number(userId));
 
+    await userController.deleteUser(userId);
+    return res.json({
+      ok: true,
+      data: {
+        message: "Usuario eliminado"
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      data: {
+        message: "Usuario no encontrado"
+      }
+    });
+  }
+
+  /*
   if (resultIndex >= 0) {
     listUser.splice(resultIndex, 1);
     return res.json({
@@ -50,13 +66,29 @@ router.delete("/:userId", (req, res) => {
     data: {
       message: "Usuario no encontrado"
     }
-  });
+  });*/
 });
 
-router.put("/:userId", (req, res) => {
-  const { userId } = req.params;
-  const resultIndex = listUser.findIndex(user => user.id === Number(userId));
+router.put("/:userId", async (req, res) => {
+ try {const { userId } = req.params;
+  //const resultIndex = listUser.findIndex(user => user.id === Number(userId));
+  await userController.updateUser(userId,req.body);
+  return res.json({
+    ok: true,
+    data: {
+      message: "Usuario modificado"
+    }
+  });
+} catch (error) {
+  return res.status(500).json({
+    ok: false,
+    data: {
+      message: "Usuario no encontrado"
+    }
+  })
+}
 
+  /*
   if (resultIndex >= 0) {
     const { name, lastname } = req.body;
     listUser[resultIndex] = {
@@ -77,7 +109,7 @@ router.put("/:userId", (req, res) => {
     data: {
       message: "Usuario no encontrado"
     }
-  });
+  });*/
 });
 
 router.post("/", async (req, res) => {
